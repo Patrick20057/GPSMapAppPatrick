@@ -80,3 +80,9 @@ Visualiza el mapa con tu ubicación actual.
 Presiona Tomar Foto para capturar una imagen.
 
 Mantén presionado en el mapa para agregar un marcador personalizado.
+
+👨‍💻 Desarrollado por
+
+Patrick Jean Paul Vera Ossandón
+📘 Analista Programador
+📍 Chile, Ovalle
