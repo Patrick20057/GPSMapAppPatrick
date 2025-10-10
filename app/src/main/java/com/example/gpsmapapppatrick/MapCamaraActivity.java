@@ -70,8 +70,14 @@ public class MapCamaraActivity extends AppCompatActivity implements OnMapReadyCa
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
+
+            // Activa la capa de ubicación
             mMap.setMyLocationEnabled(true);
 
+            // ✅ Activa el botón flotante de ubicación
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+            // Centra el mapa en tu ubicación actual
             locationClient.getLastLocation().addOnSuccessListener(location -> {
                 if (location != null) {
                     LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
@@ -85,6 +91,7 @@ public class MapCamaraActivity extends AppCompatActivity implements OnMapReadyCa
             mMap.addMarker(new MarkerOptions().position(latLng).title("Marcador personalizado"));
         });
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
