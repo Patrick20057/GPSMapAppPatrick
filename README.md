@@ -1,85 +1,129 @@
-📱 GPS + Cámara — Android App
+# 📱 Proyecto: GPSCamera Security App
 
-Una aplicación Android que combina geolocalización con captura de imágenes.
-El usuario puede visualizar su ubicación en un mapa, agregar marcadores personalizados y tomar fotos directamente desde la interfaz.
+## 🧾 Descripción General
+La aplicación **GPSCamera Security App** fue desarrollada en **Java** utilizando **Android Studio**, con el objetivo de integrar los servicios de **Google Maps** y la **cámara del dispositivo**.  
+Permite al usuario visualizar su ubicación actual mediante GPS, agregar marcadores personalizados con un toque prolongado en el mapa y capturar fotografías directamente desde la interfaz.  
 
-🚀 Características principales
+Este proyecto forma parte de la **Actividad 2.5 — Manejo de Elementos de Seguridad** del módulo *Programación Android*, donde se realizó un análisis de vulnerabilidades y se aplicaron prácticas seguras siguiendo la pauta académica.
 
-  📍 Muestra la ubicación actual del usuario en Google Maps.
-  
-  📸 Permite tomar fotos con la cámara del dispositivo.
-  
-  📌 Agrega marcadores personalizados con un toque largo en el mapa.
-  
-  🧭 Botón flotante para volver a la ubicación actual.
-  
-  🎨 Diseño limpio y moderno con animaciones suaves.
-  
-  ✅ Compatible con permisos de ubicación y cámara.
+---
 
-🧩 Estructura del proyecto
-res/
-├── layout/
-│   ├── activity_main.xml
-│   └── activity_map_camara.xml
-├── anim/
-│   └── fade_out.xml
-├── drawable/
-│   ├── ic_launcher_background.xml
-│   └── ic_launcher_foreground.xml
-├── mipmap/
-│   ├── ic_launcher.webp
-│   └── ic_launcher_round.webp
-├── values/
-│   ├── colors.xml
-│   ├── themes.xml
-│   └── google_maps_api.xml
+## 🎯 Objetivos
+- Desarrollar una aplicación Android funcional con integración de mapa y cámara.  
+- Detectar vulnerabilidades mediante análisis estático con **MobSF**.  
+- Aplicar medidas de seguridad, buenas prácticas y documentación técnica.  
+- Subir el proyecto a **GitHub** con los archivos de análisis y mejoras implementadas.
 
-🛠️ Cambios realizados
-✅ Funcionales
+---
 
-Se agregó implements OnMapReadyCallback a MapCamaraActivity.
+## 🧩 Explicación del Código
 
-Se activó el botón flotante de ubicación con:
-mMap.getUiSettings().setMyLocationButtonEnabled(true);
-Se agregó manejo de permisos para cámara y ubicación.
+### 🔹 `MainActivity.java`
+Pantalla inicial de bienvenida. Incluye un botón que redirige a la vista principal (mapa).
 
-Se implementó onActivityResult para mostrar la foto tomada en un ImageView.
+```java
+btnStart.setOnClickListener(v -> {
+    Toast.makeText(this, "¡Bienvenido, Patrick!", Toast.LENGTH_SHORT).show();
+    Intent intent = new Intent(this, MapCamaraActivity.class);
+    startActivity(intent);
+});
+```
 
-🎨 Visuales
+👉 Usa `Intent` para la navegación y un `Toast` para retroalimentar al usuario.  
+No presenta vulnerabilidades, pero se evita incluir información sensible en los mensajes.
 
-Se rediseñó activity_main.xml con un estilo limpio y centrado.
+---
 
-Se simplificó activity_map_camara.xml para que el mapa ocupe toda la pantalla sin interferencias.
+### 🔹 `MapCamaraActivity.java`
+Gestiona Google Maps, ubicación y cámara. Implementa `OnMapReadyCallback`.
 
-Se agregó una animación de desvanecimiento (fade_out.xml) al iniciar la app.
+```java
+locationClient.getLastLocation().addOnSuccessListener(location -> {
+    if (location != null) {
+        LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
+        mMap.addMarker(new MarkerOptions().position(current).title("Tu ubicación"));
+    }
+});
+```
 
-🎬 Animaciones
+📍 Obtiene la ubicación del usuario y la muestra con un marcador.  
+Se solicita el permiso de ubicación en tiempo de ejecución para evitar accesos no autorizados.
 
-Se creó res/anim/fade_out.xml para animar el título al presionar “Iniciar”.
+---
 
-Se añadió una transición suave entre actividades con:
-overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+### 🔹 Permisos en `AndroidManifest.xml`
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.INTERNET" />
+```
+Estos permisos son esenciales para las funciones de cámara y mapa.  
+Su solicitud en tiempo real garantiza mayor control de seguridad.
 
-📦 Requisitos
+---
 
-Android Studio Arctic Fox o superior
+## 🛡️ Análisis de Vulnerabilidades (MobSF)
+Se realizó un análisis estático con **Mobile Security Framework (MobSF)** obteniendo una puntuación de **45/100 (riesgo medio)**.  
 
-API Level 21+ (Android 5.0 o superior)
+**Principales hallazgos:**
+1. API Key expuesta en `google_maps_api.xml`.  
+2. Modo Debug activado (`android:debuggable="true"`).  
+3. Copia de datos habilitada (`android:allowBackup="true"`).  
+4. Firma con certificado de depuración.  
+5. Permisos peligrosos sin racionalidad.  
 
-Conexión a internet para cargar el mapa
+Todos los detalles están documentados en [`Documentos/vulnerabilities.md`](Documentos/vulnerabilities.md).
 
-Permisos de ubicación y cámara habilitados
+---
 
-🧪 Cómo usar
+## 🧠 Mejores Prácticas Aplicadas
+- API Key protegida en `local.properties`.  
+- Debug y Backup desactivados.  
+- Permisos solicitados con explicación al usuario.  
+- Aplicación del principio de “mínimo privilegio”.  
+- Uso de HTTPS en futuras conexiones.
 
-Abre la aplicación y presiona Iniciar.
+📄 Ver documento completo: [`Documentos/best_practices.md`](Documentos/best_practices.md)
 
-Visualiza el mapa con tu ubicación actual.
+---
 
-Presiona Tomar Foto para capturar una imagen.
+## 🔒 Security Tips Implementados
+- Solicitar permisos solo cuando sea necesario.  
+- Evitar almacenamiento sin cifrado.  
+- Eliminar logs antes de publicar.  
+- Revisar dependencias y librerías cada trimestre.  
 
-Mantén presionado en el mapa para agregar un marcador personalizado.
+📄 Ver: [`Documentos/security-tips.md`](Documentos/security-tips.md)
+
+---
+
+## 📈 Programa de Mejora Continua
+Se diseñó un plan de revisión periódica de seguridad con actividades mensuales, trimestrales y semestrales para mantener la aplicación libre de vulnerabilidades.
+
+📄 Ver: [`Documentos/security_improvement_program.md`](Documentos/security_improvement_program.md)
+
+---
+
+## 🚀 Ejecución Segura
+1. Configurar la API Key en `local.properties`.  
+2. Revisar los permisos al ejecutar por primera vez.  
+3. Generar el APK **release** firmado.  
+4. Analizar la app con MobSF antes de publicar.
+
+---
+
+## 📘 Reflexión Final
+El desarrollo de esta aplicación permitió comprender la importancia de **la seguridad en el ciclo de vida del software móvil**.  
+Se adquirieron conocimientos sobre detección de vulnerabilidades, uso responsable de permisos, cifrado de datos y documentación profesional de seguridad.  
+
+---
+
+**Autor:** Patrick Jean Paul Vera Ossandón  
+**Carrera:** Analista Programador  
+**Año:** 2025  
+**Institución:** Instituto Profesional / CFT
+
 
 👨‍💻 Desarrollado por
 
